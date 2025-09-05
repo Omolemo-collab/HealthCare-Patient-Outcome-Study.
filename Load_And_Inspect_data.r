@@ -47,3 +47,17 @@ survival_data <- survival_data %>%
 survival_data <- cleaned_data %>%
     filter(event %in% c(0, 1))
 
+#Remove duplicate patient records
+survival_data<- survival_data %>%
+    distinct(patient_id, .keep_all = TRUE)
+
+#Survival Variables
+survival_data<- survival_data %>%
+    mutate(
+        #calculates follow up time in days
+        time_to_event = as.numeric(difftime(event_date, 
+        admission_date, units = "days")),
+
+        #events are in binary (0 = censored, 1 = event)
+        event_status = ifelse(event %in% c(1), 1, 0)
+    )
