@@ -134,3 +134,109 @@ plot(km_fit,
     lwd = 2)
 
 summary(km_fit)
+
+#1 Fit Kaplan Meier Curves by gender 
+km_fit_gender <- survfit(surv_object ~ gender,
+ data = survival_data)
+
+#2 Plot Kaplan-Meier curves by gender
+plot(km_fit_gender,
+col = c("blue", "red"),
+lwd = 2,
+xlab = "Time (days)",
+ylab = "Survival Probability", 
+main = "Survival Curves by Gender") 
+
+legend("bottomleft", 
+    legend = c("Male", "Female"),
+    col = c("blue", "red"),
+    lwd = 2)
+
+# Log rank test to compare survival by gender
+logrank_test <- survdiff(surv_object - gender, data = survival_data)
+
+print(logrank_test)
+
+# Review **
+#1.Cleaned data
+#2. Built survival objects
+#3.Fitted Kaplan _Meier curves
+#4 Compared survival across groups (visually and statistically)
+
+
+#** Fitting a Cox model
+
+cox_model <- coxph(surv_object ~ age + gender +
+treatment_type, data = survival_data)
+
+summary(cox_model)
+
+#Fittinng the mode;
+cox_model <- coxph (Surv(time, event) ~ treatment + age,
+ data = Clean_data)
+
+summary(cox_model)
+
+#Test proportional hazards assumption
+ph_test <- cox.zph(cox_model)
+
+print(ph_test)
+
+plot(ph_test)
+
+Summary(cox_model)
+
+# Kaplan-Meier survival curves by treatment type
+km_fit <- survfit(Surv(time, event) ~ treatment_type, data = survival_data)
+
+# Plot survival curves
+plot(km_fit, col = 1:3, lty = 1, xlab = "Days", ylab = "Survival Probability")
+legend("bottomleft", legend = levels(survival_data$treatment_type), col = 1:3, lty = 1)
+
+
+# Compare survival curves across treatment types
+survdiff(Surv(time, event) ~ treatment_type, data = survival_data)
+
+# Build Cox proportional hazards model
+cox_model <- coxph(Surv(time, event) ~ age + gender + treatment_type, data = survival_data)
+
+# View results
+summary(cox_model)
+
+# Test proportional hazards assumption
+ph_test <- cox.zph(cox_model)
+
+# Print results
+print(ph_test)
+
+# Plot for visual inspection
+plot(ph_test)
+
+# Extract coefficients, hazard ratios, and confidence intervals
+cox_summary <- summary(cox_model)
+
+# Create a clean table
+results_table <- data.frame(
+  Variable = rownames(cox_summary$coefficients),
+  Hazard_Ratio = round(exp(cox_summary$coefficients[, "coef"]), 2),
+  Lower_CI = round(exp(cox_summary$conf.int[, "lower .95"]), 2),
+  Upper_CI = round(exp(cox_summary$conf.int[, "upper .95"]), 2),
+  P_value = round(cox_summary$coefficients[, "Pr(>|z|)"], 3)
+)
+
+# View table
+print (results_table)
+
+# Extract deviance residuals
+residuals_dev <- residuals(cox_model, type = "deviance")
+
+# Quick summary
+summary(residuals_dev)
+
+#  plot residuals vs fitted values
+plot(fitted(cox_model), residuals_dev,
+     xlab = "Fitted values",
+     ylab = "Deviance Residuals",
+     main = "Residuals vs Fitted")
+abline(h = 0, col = "red")
+
