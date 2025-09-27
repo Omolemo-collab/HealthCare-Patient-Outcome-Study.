@@ -126,3 +126,12 @@ results_table <- data.frame(
   P_value = round(cox_summary$coefficients[, "Pr(>|z|)"], 3)
 )
 print(results_table)
+
+# Export a Cox summary table
+cox_summary <- summary(cox_model)$coefficients
+write.csv(cox_summary, "cox_summary.csv", row.names = TRUE)
+
+# Export survival plot
+png("survival_curve.png")
+plot(km_fit, main="Kaplan-Meier Curve")
+dev.off()
